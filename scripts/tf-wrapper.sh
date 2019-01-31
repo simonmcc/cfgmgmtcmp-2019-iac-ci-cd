@@ -51,7 +51,7 @@ TF_VARS_FILE=$(map_branch_to_tfvars ${GIT_BRANCH})
 APP_SHA=$(git ls-tree HEAD app | cut -d" " -f3 | cut -f1)
 TAG_EXISTS=$(tag_exists ${APP_SHA})
 if [ "${TAG_EXISTS}" == 'true' ]; then
-  export TF_VAR_app_ami="${APP_SHA}"
+  export TF_VAR_app_ami_sha="${APP_SHA}"
 else
   echo "ERROR: Couldn't find AMI matching ${APP_SHA}, aborting"
   exit 1

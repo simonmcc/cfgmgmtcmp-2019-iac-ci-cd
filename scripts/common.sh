@@ -22,6 +22,25 @@ tag_exists () {
     fi
 }
 
+get_sha_for_object() {
+  local git_object=$1
+
+  export SHA=$(git ls-tree HEAD "${git_object}" | cut -d" " -f3 | cut -f1)
+
+  if git diff --no-ext-diff --quiet --exit-code "${git_object}" > /dev/null ; then
+    # git_object is dirty, flag it as such so that we don't pollute artefacts
+
+    if [ ! -z "$_system_type" -a "$_system_type" != 'Darwin' ]; then
+      # linux/alpine 2019-01-31T12:09:47+0000
+      SHA="${SHA}-DIRTY-$(date -Iseconds)"
+    else
+      # macOS/Darwin - emulate the ISO-8601 format
+      SHA="${SHA}-DIRTY-$(date +"%Y-%m-%dT%H:%M:%S%z")"
+    fi
+  fi
+  echo "${SHA}"
+}
+
 ami_from_sha () {
     local SHA=$1
     if [[ -z "$SHA" ]]; then

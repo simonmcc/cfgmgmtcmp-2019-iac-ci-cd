@@ -35,22 +35,25 @@ fi
 if [[ -z "$BASE_NAME" ]]; then
     echo "No base AMI given"
 else
-    export BASE_BUILT=$(base_rebuilt $BASE_NAME)
+    BASE_BUILT="$(base_rebuilt "${BASE_NAME}")"
+    export BASE_BUILT
     if [ "${BASE_BUILT}" = "true" ]; then
         echo "Couldn't find ${BASE_NAME} in manifest-${BASE_NAME}.json, looking up AMI via EC2 API"
     fi
-    export AMI_BASE="$(get_base_ami "$BASE_BUILT" "$BASE_NAME" "$BASE_NAME")"
+    AMI_BASE="$(get_base_ami "$BASE_BUILT" "$BASE_NAME" "$BASE_NAME")"
+    export AMI_BASE
 fi
 
-export SHA=$(git ls-tree HEAD "$DIR" | cut -d" " -f3 | cut -f1)
-TAG_EXISTS=$(tag_exists $SHA)
+SHA=$(get_sha_for_object "${DIR}")
+TAG_EXISTS=$(tag_exists "$SHA")
 
 if [ "$TAG_EXISTS" = "false" ]; then
     echo "No AMI found for ${NAME} (SHA: ${SHA}), building one.."
-    packer build ${DIR}/$NAME.json
+    export SHA
+    packer build "${DIR}/$NAME.json"
     PACKER_EXIT=$?
     echo "Packer exit code: ${PACKER_EXIT}"
 else
     echo "AMI found for ${NAME} (SHA: ${SHA})"
-    touch manifest-${NAME}.json
+    touch "manifest-${NAME}.json"
 fi

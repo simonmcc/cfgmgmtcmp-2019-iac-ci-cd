@@ -1,0 +1,8 @@
+backend_config.tf
+plan.out
+.terraform/
+aws-security/files/
+manifest-*.json
+output.json
+packer-vpc/terraform.tfstate
+packer-vpc/terraform.tfstate.backup
