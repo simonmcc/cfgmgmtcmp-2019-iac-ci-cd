@@ -10,6 +10,7 @@ variable "subnet_packer_cidr" {
 
 resource "aws_vpc" "packer" {
   cidr_block = "${var.vpc_packer_cidr}"
+
   tags = {
     Name = "packer-vpc"
   }
@@ -37,7 +38,7 @@ resource "aws_route_table" "packer" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id  = "${aws_internet_gateway.packer.id}"
+    gateway_id = "${aws_internet_gateway.packer.id}"
   }
 
   tags = {
