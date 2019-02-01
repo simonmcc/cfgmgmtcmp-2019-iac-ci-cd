@@ -27,7 +27,7 @@ get_sha_for_object() {
 
   export SHA=$(git ls-tree HEAD "${git_object}" | cut -d" " -f3 | cut -f1)
 
-  if git diff --no-ext-diff --quiet --exit-code "${git_object}" > /dev/null ; then
+  if ! git diff --no-ext-diff --quiet --exit-code "${git_object}" > /dev/null ; then
     # git_object is dirty, flag it as such so that we don't pollute artefacts
 
     if [ ! -z "$_system_type" -a "$_system_type" != 'Darwin' ]; then

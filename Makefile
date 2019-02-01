@@ -20,6 +20,12 @@ manifest-app.json: packer-vpc manifest-base.json Makefile $(shell find app/ -typ
 	packer validate ./app/app.json
 	./scripts/build.sh app app base
 
+.PHONY: terraform
+terraform: manifest-app.json terraform.tf
+	./scripts/tf-wrapper.sh -a plan
+	./scripts/tf-wrapper.sh -a apply
+
+
 clean:
 	./scripts/clean.sh base base
 	./scripts/clean.sh app app

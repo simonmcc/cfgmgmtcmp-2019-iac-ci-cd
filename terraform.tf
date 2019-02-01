@@ -127,6 +127,7 @@ resource "aws_instance" "web" {
 
   tags = {
     Name           = "HelloWorld"
+    Source_AMI     = "${data.aws_ami.centos.id}"
     Source_AMI_SHA = "${var.app_ami_sha}"
   }
 }
