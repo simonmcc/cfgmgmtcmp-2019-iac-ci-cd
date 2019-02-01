@@ -1,4 +1,6 @@
-provider "aws" {}
+provider "aws" {
+  skip_credentials_validation = true
+}
 
 variable "vpc_packer_cidr" {
   type = "string"
