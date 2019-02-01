@@ -27,7 +27,12 @@ pipeline {
           }
         }
         stage('terraform fmt') {
-          agent { docker { image 'simonmcc/hashicorp-pipeline:latest' } }
+          agent {
+            docker {
+              image 'simonmcc/hashicorp-pipeline:latest'
+              alwaysPull true
+            }
+          }
           steps {
             checkout scm
             sh "terraform fmt -check=true -diff=true"
