@@ -1,4 +1,6 @@
-provider "aws" {}
+provider "aws" {
+  region = "us-east-1"
+}
 
 variable "vpc_packer_cidr" {
   type = "string"
