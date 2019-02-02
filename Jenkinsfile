@@ -43,16 +43,12 @@ pipeline {
     stage('build AMIs') {
       agent { docker { image 'simonmcc/hashicorp-pipeline:latest' } }
       steps {
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'demo-aws-creds']]) {
-          sh 'aws s3api list-buckets --query "Buckets[].Name"'
-        }
         checkout scm
         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                           credentialsId: 'demo-aws-creds',
                           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY' ]]) {
-            sh "env | grep -e AWS"
-            sh "cd packer-vpc ; ls -la ; env | grep -e AWS ; terraform init ; terraform apply -auto-approve"
+            sh "cd packer-vpc ; terraform init ; terraform apply -auto-approve"
             sh "./scripts/build.sh base base"
             sh "./scripts/build.sh app app"
         }
