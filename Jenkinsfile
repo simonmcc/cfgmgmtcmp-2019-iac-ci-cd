@@ -43,11 +43,11 @@ pipeline {
     stage('build AMIs') {
       agent { docker { image 'simonmcc/hashicorp-pipeline:latest' } }
       steps {
-        checkout scm
         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                           credentialsId: 'demo-aws-creds',
                           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY' ]]) {
+            checkout scm
             sh "env | grep AWS"
             sh "cd packer-vpc ; terraform init ; terraform apply -auto-approve"
             sh "./scripts/build.sh base base"
