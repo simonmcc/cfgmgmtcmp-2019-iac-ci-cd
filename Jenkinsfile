@@ -43,6 +43,9 @@ pipeline {
     stage('build AMIs') {
       agent { docker { image 'simonmcc/hashicorp-pipeline:latest' } }
       steps {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ID']]) {
+          sh 'aws s3api list-buckets --query "Buckets[].Name"'
+        }
         checkout scm
         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                           credentialsId: 'demo-aws-creds',
