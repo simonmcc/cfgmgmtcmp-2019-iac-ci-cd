@@ -9,6 +9,20 @@ pipeline {
   }
 
   stages {
+    stage('AWS Creds Check AMIs') {
+      agent { docker { image 'simonmcc/hashicorp-pipeline:latest' } }
+      steps {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'demo-aws-creds',
+                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY' ]]) {
+          checkout scm
+          sh "env | grep AWS"
+          sh "aws s3 ls"
+          sh "cd packer-vpc ; terraform init ; terraform apply -auto-approve"
+        }
+      }
+    }
     stage('Validate & lint') {
       parallel {
         stage('packer validate') {
