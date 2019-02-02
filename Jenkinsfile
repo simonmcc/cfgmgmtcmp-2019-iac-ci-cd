@@ -48,12 +48,10 @@ pipeline {
                           credentialsId: 'demo-aws-creds',
                           accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                           secretKeyVariable: 'AWS_SECRET_ACCESS_KEY' ]]) {
-          wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
             sh "env | grep -e AWS"
             sh "cd packer-vpc ; ls -la ; env | grep -e AWS ; terraform init ; terraform apply -auto-approve"
             sh "./scripts/build.sh base base"
             sh "./scripts/build.sh app app"
-          }
         }
       }
     }
