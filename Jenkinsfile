@@ -44,10 +44,7 @@ pipeline {
       agent { docker { image 'simonmcc/hashicorp-pipeline:latest' } }
       steps {
         checkout scm
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                          credentialsId: 'demo-aws-creds',
-                          accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                          secretKeyVariable: 'AWS_SECRET_ACCESS_KEY' ]]) {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'demo-aws-creds']]) {
             sh "cd packer-vpc ; terraform init ; terraform apply -auto-approve"
             sh "./scripts/build.sh base base"
             sh "./scripts/build.sh app app"
@@ -176,11 +173,6 @@ pipeline {
           }
         }
       }
-    }
-  }
-  post {
-    always {
-      cleanWs()
     }
   }
 }
