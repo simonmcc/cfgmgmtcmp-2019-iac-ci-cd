@@ -45,6 +45,7 @@ pipeline {
       steps {
         checkout scm
         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'demo-aws-creds']]) {
+            sh "env | grep AWS"
             sh "cd packer-vpc ; terraform init ; terraform apply -auto-approve"
             sh "./scripts/build.sh base base"
             sh "./scripts/build.sh app app"
