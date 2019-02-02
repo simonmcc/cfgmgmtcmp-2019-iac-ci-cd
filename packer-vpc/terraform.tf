@@ -1,4 +1,4 @@
-provider "aws" { }
+provider "aws" {}
 
 variable "vpc_packer_cidr" {
   type = "string"
