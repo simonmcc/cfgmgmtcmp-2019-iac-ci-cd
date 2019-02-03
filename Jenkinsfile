@@ -10,9 +10,9 @@ pipeline {
 
   stages {
     stage('AWS Creds Check AMIs') {
-      //agent { docker { image 'simonmcc/hashicorp-pipeline:latest' } }
+      agent { docker { image 'simonmcc/hashicorp-pipeline:latest' } }
       steps {
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'demo-aws-creds']]) {
+        withCredentials([usernamePassword(credentialsId: 'demo-aws-creds-up', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
           sh "env | grep AWS"
           sh "aws s3 ls"
         }
