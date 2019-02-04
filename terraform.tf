@@ -135,4 +135,3 @@ resource "aws_instance" "web" {
 output "aws_instance_web_public_ip" {
   value = "${aws_instance.web.public_ip}"
 }
-
