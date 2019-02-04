@@ -4,6 +4,7 @@ params = JSON.parse(content)
 
 vpc_id = params['main_vpc_id']['value']
 dmz_vpc_id = params['dmz_vpc_id']['value']
+aws_instance_web_public_ip = params['aws_instance_web_public_ip']['value']
 
 describe aws_vpc(vpc_id) do
   its('state') { should eq 'available' }
@@ -15,4 +16,8 @@ end
 describe aws_vpc(dmz_vpc_id) do
   its('state') { should eq 'available' }
   # its('cidr_block') { should eq '172.19.0.0/16' }
+end
+
+describe http('https://'+aws_instance_web_public_ip) do
+  its('status') { should cmp 200 }
 end
