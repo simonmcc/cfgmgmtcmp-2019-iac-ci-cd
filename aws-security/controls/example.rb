@@ -22,8 +22,4 @@ control "world-1.0" do                                # A unique ID for this con
     its('state') { should eq 'available' }
     # its('cidr_block') { should eq '172.19.0.0/16' }
   end
-
-  describe http("https://#{aws_instance_web_public_ip}") do
-    its('status') { should cmp 200 }
-  end
 end
