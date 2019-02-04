@@ -6,18 +6,24 @@ vpc_id = params['main_vpc_id']['value']
 dmz_vpc_id = params['dmz_vpc_id']['value']
 aws_instance_web_public_ip = params['aws_instance_web_public_ip']['value']
 
-describe aws_vpc(vpc_id) do
-  its('state') { should eq 'available' }
-  # as we vary these based on the branch (master.tfvars & testing-defaults.tfvars)
-  # we can't check the cidr without exporting the CIDR via output.json
-  # its('cidr_block') { should eq '172.18.0.0/16' }
-end
+control "world-1.0" do                                # A unique ID for this control
+  impact 1.0                                          # Just how critical is
+  title "Hello World"                                 # Readable by a human
+  desc "Text should include the words 'hello world'." # Optional description
 
-describe aws_vpc(dmz_vpc_id) do
-  its('state') { should eq 'available' }
-  # its('cidr_block') { should eq '172.19.0.0/16' }
-end
+  describe aws_vpc(vpc_id) do
+    its('state') { should eq 'available' }
+    # as we vary these based on the branch (master.tfvars & testing-defaults.tfvars)
+    # we can't check the cidr without exporting the CIDR via output.json
+    # its('cidr_block') { should eq '172.18.0.0/16' }
+  end
 
-describe http("https://#{aws_instance_web_public_ip}") do
-  its('status') { should cmp 200 }
+  describe aws_vpc(dmz_vpc_id) do
+    its('state') { should eq 'available' }
+    # its('cidr_block') { should eq '172.19.0.0/16' }
+  end
+
+  describe http("https://#{aws_instance_web_public_ip}") do
+    its('status') { should cmp 200 }
+  end
 end
