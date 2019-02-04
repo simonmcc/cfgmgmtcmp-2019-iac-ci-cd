@@ -54,7 +54,7 @@ resource "aws_route_table" "dmz" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id  = "${aws_internet_gateway.dmz.id}"
+    gateway_id = "${aws_internet_gateway.dmz.id}"
   }
 
   tags = {
@@ -65,6 +65,41 @@ resource "aws_route_table" "dmz" {
 resource "aws_route_table_association" "dmz" {
   subnet_id      = "${aws_subnet.dmz.id}"
   route_table_id = "${aws_route_table.dmz.id}"
+}
+
+resource "aws_security_group" "web_dmz" {
+  name        = "Web DMZ"
+  description = "Allow ssh, http, https inbound traffic"
+  vpc_id      = "${aws_vpc.dmz.id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # allow everything out
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 data "aws_ami" "centos" {
@@ -86,13 +121,13 @@ resource "aws_instance" "web" {
   ami           = "${data.aws_ami.centos.id}"
   instance_type = "t2.micro"
 
-  subnet_id = "${aws_subnet.dmz.id}"
+  subnet_id                   = "${aws_subnet.dmz.id}"
   associate_public_ip_address = "true"
+  vpc_security_group_ids      = ["${aws_security_group.web_dmz.id}"]
 
   tags = {
-    Name = "HelloWorld"
+    Name           = "HelloWorld"
+    Source_AMI     = "${data.aws_ami.centos.id}"
     Source_AMI_SHA = "${var.app_ami_sha}"
   }
 }
-
-

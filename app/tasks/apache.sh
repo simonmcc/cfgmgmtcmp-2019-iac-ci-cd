@@ -3,7 +3,8 @@ set -e
 
 echo '---- install Apache'
 
-yum install -y httpd
+sudo yum install -y httpd
+sudo systemctl enable httpd
 
 cat > /var/www/html/index.html <<HERE
 Plain text FTW!
