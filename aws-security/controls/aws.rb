@@ -4,11 +4,10 @@ params = JSON.parse(content)
 
 vpc_id = params['main_vpc_id']['value']
 dmz_vpc_id = params['dmz_vpc_id']['value']
-aws_instance_web_public_ip = params['aws_instance_web_public_ip']['value']
 
-control "world-1.0" do                                # A unique ID for this control
+control "aws-1.0" do                                  # A unique ID for this control
   impact 1.0                                          # Just how critical is
-  title "Hello World"                                 # Readable by a human
+  title "AWS Sanity Check"                            # Readable by a human
   desc "Text should include the words 'hello world'." # Optional description
 
   describe aws_vpc(vpc_id) do
