@@ -11,7 +11,7 @@ control "web-1.0" do                                # A unique ID for this contr
   title "Web Sanity Check"                          # Readable by a human
   desc "Text should include the words 'hello world'." # Optional description
 
-  describe http("http://${aws_instance_web_public_ip}") do
+  describe http("http://" + aws_instance_web_public_ip) do
     its('status') { should cmp 200 }
   end
 end
