@@ -185,8 +185,6 @@ pipeline {
   }
   post {
     always {
-      sh "echo how we fire up another container here to destroy?"
-      stage('destroy test stack') {
         agent {
           docker {
             image 'simonmcc/hashicorp-pipeline:latest'
@@ -203,7 +201,6 @@ pipeline {
             sh "./scripts/tf-wrapper.sh -a destroy"
           }
         }
-      }
     }
   }
 }
