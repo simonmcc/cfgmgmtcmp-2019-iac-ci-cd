@@ -109,6 +109,10 @@ pipeline {
           sh "inspec exec aws-security --reporter=cli junit:test-results/inspec-aws-junit.xml --controls aws-1.0 -t aws://us-east-1"
           sh "inspec exec aws-security --reporter=cli junit:test-results/inspec-web-junit.xml --controls web-1.0"
           sh "touch test-results/inspec-junit.xml"
+        }
+      }
+      post {
+        always {
           junit 'test-results/*.xml'
         }
       }
@@ -131,6 +135,7 @@ pipeline {
         }
       }
     }
+
     stage('terraform plan - master') {
       agent {
         docker {
@@ -178,4 +183,23 @@ pipeline {
       }
     }
   }
+  post {
+    always {
+      agent {
+        docker {
+          image 'simonmcc/hashicorp-pipeline:latest'
+          // yes, this is horrible, but something is broken in withCredentials & docker agents
+          args "--env AWS_ACCESS_KEY_ID=${AWS_CRED_USR} --env AWS_SECRET_ACCESS_KEY=${AWS_CRED_PSW}"
+        }
+      }
+      when {
+        expression { env.BRANCH_NAME != 'master' }
+      }
+      steps {
+        checkout scm
+        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+          sh "./scripts/tf-wrapper.sh -a destroy"
+        }
+      }
+    }
 }
