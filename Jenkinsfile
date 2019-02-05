@@ -185,21 +185,7 @@ pipeline {
   }
   post {
     always {
-      agent {
-        docker {
-          image 'simonmcc/hashicorp-pipeline:latest'
-          // yes, this is horrible, but something is broken in withCredentials & docker agents
-          args "--env AWS_ACCESS_KEY_ID=${AWS_CRED_USR} --env AWS_SECRET_ACCESS_KEY=${AWS_CRED_PSW}"
-        }
-      }
-      when {
-        expression { env.BRANCH_NAME != 'master' }
-      }
-      steps {
-        checkout scm
-        wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
-          sh "./scripts/tf-wrapper.sh -a destroy"
-        }
-      }
+      sh "echo how we fire up another container here to destroy?"
     }
+  }
 }
