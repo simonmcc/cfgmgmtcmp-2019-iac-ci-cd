@@ -186,7 +186,7 @@ pipeline {
   post {
     // drop to scripted mode pipeline so that we can specify a node for the post stage to run on
     always {
-      node {
+      node('none') {
         script {
           checkout scm
           //args "--env AWS_ACCESS_KEY_ID=${AWS_CRED_USR} --env AWS_SECRET_ACCESS_KEY=${AWS_CRED_PSW}"
