@@ -64,6 +64,7 @@ generate_terraform_backend
 
 [[ ! -d .terraform ]] && terraform init
 # the workspace may already exist - safe to ignore & carry on
+terraform workspace list || true
 terraform workspace new ${TF_WORKSPACE} || true
 echo "Selecting workspace: ${TF_WORKSPACE}"
 terraform workspace select ${TF_WORKSPACE}
