@@ -11,7 +11,9 @@
 #
 set -e
 # DEBUG
-#set -x
+if [ "${DEBUG}" -eq 1 ]; then
+  set -x
+fi
 
 THIS_SCRIPT=${BASH_SOURCE[0]:-$0}
 # grumble, moan, PATH, symlinks

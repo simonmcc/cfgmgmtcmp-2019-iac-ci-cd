@@ -7,6 +7,7 @@ pipeline {
   environment {
      AWS_DEFAULT_REGION = 'us-east-1'
      AWS_CRED = credentials('demo-aws-creds-up')
+     DEBUG = 1
   }
 
   stages {
@@ -184,6 +185,7 @@ pipeline {
     }
   }
   post {
+    // always run a "terraform destroy", as the build-test-destroy chain will skip the destroy step of test fails
     always {
       // drop to scripted mode pipeline so that we can specify a node for the post stage to run on
       script {
