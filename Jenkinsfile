@@ -189,9 +189,10 @@ pipeline {
       script {
         echo "this is a scripted fragment"
         checkout scm
-        docker.image("simonmcc/hashicorp-pipeline:latest").inside {
-          sh 'ls'
-        }
+          docker.image("simonmcc/hashicorp-pipeline:latest").inside("--env AWS_ACCESS_KEY_ID=${AWS_CRED_USR} --env AWS_SECRET_ACCESS_KEY=${AWS_CRED_PSW}") {
+            sh "env | grep AWS"
+            sh "./scripts/tf-wrapper.sh -a destroy"
+          }
       }
     }
   }
