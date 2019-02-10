@@ -192,7 +192,8 @@ pipeline {
         if(env.BRANCH_NAME != "master") {
           checkout scm
           docker.image("simonmcc/hashicorp-pipeline:latest").inside("--env AWS_ACCESS_KEY_ID=${AWS_CRED_USR} --env AWS_SECRET_ACCESS_KEY=${AWS_CRED_PSW}") {
-            sh "./scripts/tf-wrapper.sh -a destroy"
+            sh "pwd"
+            sh "DEBUG=1 ./scripts/tf-wrapper.sh -a destroy"
           }
         }
       }
