@@ -1,4 +1,4 @@
-all: base app
+all: base app terraform
 
 base: manifest-base.json
 app: manifest-app.json
@@ -12,11 +12,11 @@ packer-vpc-clean:
 	cd packer-vpc ; terraform destroy -auto-approve
 	@rm -f packer-vpc/terraform.tfstate
 
-manifest-base.json: packer-vpc Makefile $(shell find base/ -type f)
+manifest-base.json: packer-vpc $(shell find base/ -type f)
 	packer validate ./base/base.json
 	./scripts/build.sh base base
 
-manifest-app.json: packer-vpc manifest-base.json Makefile $(shell find app/ -type f)
+manifest-app.json: packer-vpc manifest-base.json $(shell find app/ -type f)
 	packer validate ./app/app.json
 	./scripts/build.sh app app base
 
@@ -25,15 +25,6 @@ terraform: manifest-app.json terraform.tf
 	./scripts/tf-wrapper.sh -a plan
 	./scripts/tf-wrapper.sh -a apply
 
-
 clean:
 	./scripts/clean.sh base base
 	./scripts/clean.sh app app
-
-
-#AMI_BASE=ami-fakefake packer validate app/app.json"
-#terraform fmt
-#./scripts/build.sh base base"
-#./scripts/build.sh app app"
-#./scripts/tf-wrapper.sh -a plan"
-#./scripts/tf-wrapper.sh -a apply"

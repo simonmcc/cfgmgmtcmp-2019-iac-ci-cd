@@ -131,3 +131,7 @@ resource "aws_instance" "web" {
     Source_AMI_SHA = "${var.app_ami_sha}"
   }
 }
+
+output "aws_instance_web_public_ip" {
+  value = "${aws_instance.web.public_ip}"
+}
