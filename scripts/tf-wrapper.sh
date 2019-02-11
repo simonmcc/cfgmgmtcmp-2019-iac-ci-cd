@@ -65,7 +65,6 @@ generate_terraform_backend
 
 if [[ ${DEBUG} -eq 1 ]]; then
   echo "PWD:${PWD}"
-  find .terraform/
   echo "DEBUG: flushing .terraform"
   rm -rf .terraform || true
 fi
