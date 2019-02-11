@@ -75,6 +75,7 @@ pipeline {
         checkout scm
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
           sh "cat backend_config.tf"
+          sh "cat .terraform/terraform.tfstate"
           sh "./scripts/tf-wrapper.sh -a plan"
           sh "./scripts/tf-wrapper.sh -a apply"
           sh "cat output.json"
@@ -195,6 +196,7 @@ pipeline {
           docker.image("simonmcc/hashicorp-pipeline:latest").inside("--env AWS_ACCESS_KEY_ID=${AWS_CRED_USR} --env AWS_SECRET_ACCESS_KEY=${AWS_CRED_PSW}") {
             sh "pwd"
             sh "cat backend_config.tf"
+            sh "cat .terraform/terraform.tfstate"
             sh "DEBUG=1 ./scripts/tf-wrapper.sh -a destroy"
           }
         }
