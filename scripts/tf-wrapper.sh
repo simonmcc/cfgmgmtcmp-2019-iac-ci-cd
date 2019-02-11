@@ -70,6 +70,13 @@ if [[ ${DEBUG} -eq 1 ]]; then
 fi
 
 [[ ! -d .terraform ]] && terraform init
+
+if [[ ${DEBUG} -eq 1 ]]; then
+  if [[ -f .terraform/terraform.tfstate ]]; then
+    cat .terraform/terraform.tfstate
+  fi
+fi
+
 # the workspace may already exist - safe to ignore & carry on
 terraform workspace list || true
 terraform workspace new "${TF_WORKSPACE}" || true
