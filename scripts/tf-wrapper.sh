@@ -72,6 +72,9 @@ fi
 [[ ! -d .terraform ]] && terraform init
 
 if [[ ${DEBUG} -eq 1 ]]; then
+  if [[ -f backend_config.tf ]]; then
+    cat backend_config.tf
+  fi
   if [[ -f .terraform/terraform.tfstate ]]; then
     cat .terraform/terraform.tfstate
   fi
