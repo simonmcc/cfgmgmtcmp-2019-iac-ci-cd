@@ -25,6 +25,10 @@ terraform: manifest-app.json terraform.tf
 	./scripts/tf-wrapper.sh -a plan
 	./scripts/tf-wrapper.sh -a apply
 
+.PHONY: terraform-destroy
+terraform-destroy:
+	./scripts/tf-wrapper.sh -a destroy
+
 clean:
 	./scripts/clean.sh base base
 	./scripts/clean.sh app app

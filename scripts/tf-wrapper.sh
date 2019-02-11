@@ -11,7 +11,7 @@
 #
 set -e
 # DEBUG
-if [ "${DEBUG}" -eq 1 ]; then
+if [ "${DEBUG:-0}" -eq 1 ]; then
   set -x
 fi
 
@@ -59,6 +59,12 @@ else
   echo "ERROR: Couldn't find AMI matching ${APP_SHA}, aborting"
   exit 1
 fi
+
+# shellcheck disable=SC2155
+export TF_VAR_GIT_PROJECT=$(get_git_project_name)
+export TF_VAR_GIT_BRANCH=${GIT_BRANCH}
+# shellcheck disable=SC2155
+export TF_VAR_GIT_LAST_COMMIT=$(get_sha_for_repo)
 
 # create the S3 bucket, DynamoDB & matching backend.tf
 generate_terraform_backend
