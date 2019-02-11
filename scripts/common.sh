@@ -144,7 +144,12 @@ generate_terraform_backend() {
     local TABLE_NAME
 
     if [[ -z "$1" ]]; then
-        PROJECT_NAME="${PWD##*/}" # use current dir name
+        # Jenkins breaks the current dir name approach as each job gets a workspace
+        # PROJECT_NAME="${PWD##*/}" # use current dir name
+        GIT_REMOTE_URL=$(git remote -v | awk '/^origin.*\(fetch\)$/{ print $2 }')
+        PROJECT_NAME=$(echo ${GIT_REMOTE_URL} | perl -ne 'print "$7\n" if (/((git|ssh|http(s)?)|(git@[\w\.]+))(:(\/\/[\w\.]+\/)?)([\w\.@\:\/\-~]+)(\.git)(\/)?/);')
+        # replace / with -
+        PROJECT_NAME=$(echo ${PROJECT_NAME} | tr / -)
     else
         PROJECT_NAME=$1
     fi

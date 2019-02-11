@@ -5,8 +5,9 @@
 pipeline {
   agent any
   environment {
-     AWS_DEFAULT_REGION = 'us-east-1'
-     AWS_CRED = credentials('demo-aws-creds-up')
+    AWS_DEFAULT_REGION = 'us-east-1'
+    AWS_CRED = credentials('demo-aws-creds-up')
+    DEBUG = 0
   }
 
   stages {
@@ -106,8 +107,15 @@ pipeline {
           sh "mkdir aws-security/files || true"
           sh "mkdir test-results || true"
           sh "cp output.json aws-security/files/output.json"
-          sh "inspec exec aws-security --reporter=cli junit:test-results/inspec-junit.xml -t aws://us-east-1"
+          // give the stack time to finish starting..
+          sh "sleep 30"
+          sh "inspec exec aws-security --reporter=cli junit:test-results/inspec-aws-junit.xml --controls aws-1.0 -t aws://us-east-1"
+          sh "inspec exec aws-security --reporter=cli junit:test-results/inspec-web-junit.xml --controls web-1.0"
           sh "touch test-results/inspec-junit.xml"
+        }
+      }
+      post {
+        always {
           junit 'test-results/*.xml'
         }
       }
@@ -130,6 +138,7 @@ pipeline {
         }
       }
     }
+
     stage('terraform plan - master') {
       agent {
         docker {
@@ -175,6 +184,23 @@ pipeline {
           sh "./scripts/tf-wrapper.sh -a apply"
         }
       }
+    }
+  }
+  post {
+    // always run a "terraform destroy", as the build-test-destroy chain will skip the destroy step of test fails
+    always {
+      // drop to scripted mode pipeline so that we can specify a node for the post stage to run on
+      script {
+        if(env.BRANCH_NAME != "master") {
+          checkout scm
+          docker.image("simonmcc/hashicorp-pipeline:latest").inside("--env AWS_ACCESS_KEY_ID=${AWS_CRED_USR} --env AWS_SECRET_ACCESS_KEY=${AWS_CRED_PSW}") {
+            sh "./scripts/tf-wrapper.sh -a destroy"
+          }
+        }
+      }
+    }
+    cleanup {
+      cleanWs()
     }
   }
 }

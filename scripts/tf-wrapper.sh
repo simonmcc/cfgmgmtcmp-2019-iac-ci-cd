@@ -11,17 +11,20 @@
 #
 set -e
 # DEBUG
-#set -x
+if [ "${DEBUG}" -eq 1 ]; then
+  set -x
+fi
 
 THIS_SCRIPT=${BASH_SOURCE[0]:-$0}
 # grumble, moan, PATH, symlinks
 if [[ -L "${THIS_SCRIPT}" ]]; then
-  THIS_SCRIPT=`readlink ${THIS_SCRIPT} 2>&1`
+  THIS_SCRIPT=$(readlink "${THIS_SCRIPT}" 2>&1)
 fi
 PROJECT_HOME="$( cd "$( dirname "${THIS_SCRIPT}" )/.." && pwd )"
 
 # load our helper functions
-source ${PROJECT_HOME}/scripts/common.sh
+# shellcheck disable=SC1090
+source "${PROJECT_HOME}/scripts/common.sh"
 
 # default to plan, to show changes, valid opions are plan, apply & destroy
 TF_ACTION=plan
@@ -46,10 +49,10 @@ package_check
 check_aws_credentials
 
 GIT_BRANCH=$(get_git_branch)
-TF_WORKSPACE=$(map_branch_to_workspace ${GIT_BRANCH})
-TF_VARS_FILE=$(map_branch_to_tfvars ${GIT_BRANCH})
+TF_WORKSPACE=$(map_branch_to_workspace "${GIT_BRANCH}")
+TF_VARS_FILE=$(map_branch_to_tfvars "${GIT_BRANCH}")
 APP_SHA=$(git ls-tree HEAD app | cut -d" " -f3 | cut -f1)
-TAG_EXISTS=$(tag_exists ${APP_SHA})
+TAG_EXISTS=$(tag_exists "${APP_SHA}")
 if [ "${TAG_EXISTS}" == 'true' ]; then
   export TF_VAR_app_ami_sha="${APP_SHA}"
 else
@@ -60,15 +63,32 @@ fi
 # create the S3 bucket, DynamoDB & matching backend.tf
 generate_terraform_backend
 
+if [[ ${DEBUG} -eq 1 ]]; then
+  echo "PWD:${PWD}"
+  echo "DEBUG: flushing .terraform"
+  rm -rf .terraform || true
+fi
+
 [[ ! -d .terraform ]] && terraform init
+
+if [[ ${DEBUG} -eq 1 ]]; then
+  if [[ -f backend_config.tf ]]; then
+    cat backend_config.tf
+  fi
+  if [[ -f .terraform/terraform.tfstate ]]; then
+    cat .terraform/terraform.tfstate
+  fi
+fi
+
 # the workspace may already exist - safe to ignore & carry on
-terraform workspace new ${TF_WORKSPACE} || true
+terraform workspace list || true
+terraform workspace new "${TF_WORKSPACE}" || true
 echo "Selecting workspace: ${TF_WORKSPACE}"
-terraform workspace select ${TF_WORKSPACE}
+terraform workspace select "${TF_WORKSPACE}"
 case "${TF_ACTION}" in
     plan)
         [[ ! -d plan ]] && mkdir plan
-        terraform plan -var-file=${TF_VARS_FILE} -out=plan/plan.out
+        terraform plan -var-file="${TF_VARS_FILE}" -out=plan/plan.out
         ;;
     apply)
         terraform apply plan/plan.out
@@ -77,9 +97,9 @@ case "${TF_ACTION}" in
         terraform output -json > output.json
         ;;
     destroy)
-        terraform destroy -var-file=${TF_VARS_FILE} -auto-approve
+        terraform destroy -var-file="${TF_VARS_FILE}" -auto-approve
         terraform workspace select default
-        terraform workspace delete ${TF_WORKSPACE}
+        terraform workspace delete "${TF_WORKSPACE}"
         ;;
 esac
 
