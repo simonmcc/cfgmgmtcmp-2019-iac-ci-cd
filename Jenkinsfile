@@ -74,7 +74,6 @@ pipeline {
       steps {
         checkout scm
         wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
-          sh "cat backend_config.tf"
           sh "./scripts/tf-wrapper.sh -a plan"
           sh "./scripts/tf-wrapper.sh -a apply"
           sh "cat output.json"

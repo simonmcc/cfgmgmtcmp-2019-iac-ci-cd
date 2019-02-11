@@ -5,3 +5,4 @@ manifest-*.json
 output.json
 packer-vpc/terraform.tfstate
 packer-vpc/terraform.tfstate.backup
+backend_config.tf
