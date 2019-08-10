@@ -155,10 +155,12 @@ generate_terraform_backend() {
     fi
     ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 
-    if [[ "${AWS_DEFAULT_REGION}" = "us-east-1" ]]; then
+    if [[ "${AWS_DEFAULT_REGION}" == "us-east-1" ]]; then
         LOCATION_CONSTRAINT=""
+        echo "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}, not setting LOCATION_CONSTRAINT"
     else
-	      LOCATION_CONSTRAINT='--create-bucket-configuration LocationConstraint="${AWS_DEFAULT_REGION}"'
+        echo "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}, setting LOCATION_CONSTRAINT"
+	      LOCATION_CONSTRAINT="--create-bucket-configuration LocationConstraint=\"${AWS_DEFAULT_REGION}\""
     fi
 
     BUCKET_NAME="terraform-tfstate-${ACCOUNT_ID}"
