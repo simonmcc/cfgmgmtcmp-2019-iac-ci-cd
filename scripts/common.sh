@@ -22,6 +22,23 @@ tag_exists () {
     fi
 }
 
+get_sha_for_repo() {
+  local SHA=$(git rev-parse HEAD)
+
+  if ! git diff --no-ext-diff --quiet --exit-code > /dev/null ; then
+    # git_object is dirty, flag it as such so that we don't pollute artefacts
+
+    if [ ! -z "$_system_type" -a "$_system_type" != 'Darwin' ]; then
+      # linux/alpine 2019-01-31T12:09:47+0000
+      SHA="${SHA}-DIRTY-$(date -Iseconds)"
+    else
+      # macOS/Darwin - emulate the ISO-8601 format
+      SHA="${SHA}-DIRTY-$(date +"%Y-%m-%dT%H:%M:%S%z")"
+    fi
+  fi
+  echo "${SHA}"
+}
+
 get_sha_for_object() {
   local git_object=$1
 
@@ -133,6 +150,12 @@ check_aws_credentials () {
     [[ 1 ]]
 }
 
+get_git_project_name() {
+  GIT_REMOTE_URL=$(git remote -v | awk '/^origin.*\(fetch\)$/{ print $2 }')
+  PROJECT_NAME=$(echo ${GIT_REMOTE_URL} | perl -ne 'print "$7\n" if (/((git|ssh|http(s)?)|(git@[\w\.]+))(:(\/\/[\w\.]+\/)?)([\w\.@\:\/\-~]+)(\.git)(\/)?/);')
+  echo ${PROJECT_NAME}
+}
+
 generate_terraform_backend() {
     # inspired by https://github.com/hashicorp/terraform/issues/12877#issuecomment-311649591
     local PROJECT_NAME
@@ -146,8 +169,7 @@ generate_terraform_backend() {
     if [[ -z "$1" ]]; then
         # Jenkins breaks the current dir name approach as each job gets a workspace
         # PROJECT_NAME="${PWD##*/}" # use current dir name
-        GIT_REMOTE_URL=$(git remote -v | awk '/^origin.*\(fetch\)$/{ print $2 }')
-        PROJECT_NAME=$(echo ${GIT_REMOTE_URL} | perl -ne 'print "$7\n" if (/((git|ssh|http(s)?)|(git@[\w\.]+))(:(\/\/[\w\.]+\/)?)([\w\.@\:\/\-~]+)(\.git)(\/)?/);')
+        PROJECT_NAME=$(get_git_project_name)
         # replace / with -
         PROJECT_NAME=$(echo ${PROJECT_NAME} | tr / -)
     else

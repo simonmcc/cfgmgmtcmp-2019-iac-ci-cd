@@ -1,5 +1,20 @@
 provider "aws" {}
 
+variable "GIT_PROJECT" {
+  type    = "string"
+  default = "unknown"
+}
+
+variable "GIT_BRANCH" {
+  type    = "string"
+  default = "unknown"
+}
+
+variable "GIT_LAST_COMMIT" {
+  type    = "string"
+  default = "unknown"
+}
+
 variable "vpc_main_cidr" {
   type = "string"
 }
@@ -37,7 +52,10 @@ resource "aws_subnet" "dmz" {
   cidr_block = "${var.subnet_dmz_cidr}"
 
   tags = {
-    Name = "dmz-subnet"
+    Name            = "dmz-subnet"
+    GIT_PROJECT     = "${var.GIT_PROJECT}"
+    GIT_BRANCH      = "${var.GIT_BRANCH}"
+    GIT_LAST_COMMIT = "${var.GIT_LAST_COMMIT}"
   }
 }
 
@@ -45,7 +63,10 @@ resource "aws_internet_gateway" "dmz" {
   vpc_id = "${aws_vpc.dmz.id}"
 
   tags = {
-    Name = "dmz-igw"
+    Name            = "dmz-igw"
+    GIT_PROJECT     = "${var.GIT_PROJECT}"
+    GIT_BRANCH      = "${var.GIT_BRANCH}"
+    GIT_LAST_COMMIT = "${var.GIT_LAST_COMMIT}"
   }
 }
 
@@ -58,7 +79,10 @@ resource "aws_route_table" "dmz" {
   }
 
   tags = {
-    Name = "dmz default table"
+    Name            = "dmz default table"
+    GIT_PROJECT     = "${var.GIT_PROJECT}"
+    GIT_BRANCH      = "${var.GIT_BRANCH}"
+    GIT_LAST_COMMIT = "${var.GIT_LAST_COMMIT}"
   }
 }
 
@@ -100,6 +124,12 @@ resource "aws_security_group" "web_dmz" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    GIT_PROJECT     = "${var.GIT_PROJECT}"
+    GIT_BRANCH      = "${var.GIT_BRANCH}"
+    GIT_LAST_COMMIT = "${var.GIT_LAST_COMMIT}"
+  }
 }
 
 data "aws_ami" "centos" {
@@ -126,9 +156,12 @@ resource "aws_instance" "web" {
   vpc_security_group_ids      = ["${aws_security_group.web_dmz.id}"]
 
   tags = {
-    Name           = "HelloWorld"
-    Source_AMI     = "${data.aws_ami.centos.id}"
-    Source_AMI_SHA = "${var.app_ami_sha}"
+    Name            = "HelloWorld"
+    GIT_PROJECT     = "${var.GIT_PROJECT}"
+    GIT_BRANCH      = "${var.GIT_BRANCH}"
+    GIT_LAST_COMMIT = "${var.GIT_LAST_COMMIT}"
+    Source_AMI      = "${data.aws_ami.centos.id}"
+    Source_AMI_SHA  = "${var.app_ami_sha}"
   }
 }
 
