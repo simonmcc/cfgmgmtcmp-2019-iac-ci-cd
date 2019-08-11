@@ -11,7 +11,7 @@
 #
 set -e
 # DEBUG
-if [ "${DEBUG}" -eq 1 ]; then
+if [ "${DEBUG}" ==  '1' ]; then
   set -x
 fi
 
