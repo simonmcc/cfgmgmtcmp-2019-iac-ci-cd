@@ -1,19 +1,19 @@
 provider "aws" {}
 
 variable "vpc_main_cidr" {
-  type = "string"
+  type = string
 }
 
 variable "vpc_dmz_cidr" {
-  type = "string"
+  type = string
 }
 
 variable "subnet_dmz_cidr" {
-  type = "string"
+  type = string
 }
 
-variable "app_ami_sha" {
-  type = "string"
+variable app_ami_sha {
+  type = string
 }
 
 resource "aws_vpc" "main" {
